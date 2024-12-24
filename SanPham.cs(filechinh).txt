@@ -1,4 +1,5 @@
 File SanPham.cs (file chính)
+// add trong references System.Runtime.Serialization
 
 using System; // Thư viện cơ bản cho C#
 using System.Collections.Generic;
