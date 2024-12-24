@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _2021600020_LeTranDaiNghia_Goi
+{
+    public class DanhMuc
+    {
+        public int MaDM {  get; set; }
+
+        public string TenDM { get; set; }
+    }
+}

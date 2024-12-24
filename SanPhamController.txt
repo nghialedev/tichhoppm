@@ -1,0 +1,71 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using _2021600020_LeTranDaiNghia1.Models;
+
+namespace _2021600020_LeTranDaiNghia1.Controllers
+{
+    public class SanPhamController : ApiController
+    {
+       QLSPEntities db = new QLSPEntities();
+        [HttpGet]
+        public List<SanPham> LaySP()
+        {
+            return db.SanPhams.ToList();
+        }
+        [HttpGet]
+        public List<SanPham> LaySPTheoDM(int madm)
+        {
+            return db.SanPhams.Where(x => x.MaDM == madm).ToList();
+        }
+        [HttpGet]
+        public SanPham LaySPTheoMa(int ma)
+        {
+            return db.SanPhams.FirstOrDefault(x => x.Ma == ma);
+        }
+        [HttpPost]
+        public bool ThemSP(int ma, string ten, int dongia, int madm) {
+            SanPham sp = db.SanPhams.FirstOrDefault(x => x.Ma == ma);
+            if (sp == null) { 
+                SanPham sp1 = new SanPham();
+                sp1.Ma = ma;
+                sp1.Ten = ten;
+                sp1.Dongia = dongia;
+                sp1.MaDM = madm;
+                db.SanPhams.Add(sp1);
+                db.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        [HttpPut]
+        public bool SuaSP(int ma, string ten, int dongia, int madm)
+        {
+            SanPham sp = db.SanPhams.FirstOrDefault(x => x.Ma == ma);
+            if ( sp != null)
+            {
+                sp.Ma = ma;
+                sp.Ten = ten;
+                sp.Dongia = dongia;
+                sp.MaDM = madm;
+                db.SaveChanges() ;
+                return true;
+            }
+            return false;
+        }
+        [HttpDelete]
+        public bool Xoa(int ma)
+        {
+            SanPham sp = db.SanPhams.FirstOrDefault(x => x.Ma == ma);
+            if (sp != null) { 
+                db.SanPhams.Remove(sp);
+                db.SaveChanges();
+                return true;
+            }   
+            return false;
+        }
+    }
+}

@@ -1,0 +1,149 @@
+File SanPham.cs (file chính)
+
+using System; // Thư viện cơ bản cho C#
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data; // Hỗ trợ thao tác với dữ liệu
+using System.Drawing;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms; // Thư viện hỗ trợ giao diện Windows Forms
+using System.Net; // Hỗ trợ làm việc với HTTP Request/Response
+using System.Runtime.Serialization.Json; // Hỗ trợ xử lý dữ liệu JSON
+using System.IO; // Hỗ trợ làm việc với luồng dữ liệu (Stream)
+
+namespace _2021600020_LeTranDaiNghia_Goi
+{
+    public partial class bnt_Them : Form
+    {
+        // Hàm khởi tạo form
+        public bnt_Them()
+        {
+            InitializeComponent(); // Tự động tạo các thành phần trong form
+        }
+
+        // Hàm load dữ liệu từ API vào DataGridView
+        public void LoadDataGridView()
+        {
+            string link = "https://localhost:44391/api/SanPham"; // URL API lấy danh sách sản phẩm
+            HttpWebRequest request = WebRequest.CreateHttp(link); // Tạo yêu cầu HTTP GET
+            WebResponse response = request.GetResponse(); // Nhận phản hồi từ API
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bnt_Them[])); // Dùng để xử lý JSON thành mảng đối tượng
+            object data = js.ReadObject(response.GetResponseStream()); // Chuyển JSON stream thành object
+            bnt_Them[] arr = data as bnt_Them[]; // Ép kiểu object thành mảng đối tượng `bnt_Them`
+            dataGridView1.DataSource = arr; // Gắn dữ liệu vào DataGridView để hiển thị
+        }
+
+        // Hàm load danh mục sản phẩm vào ComboBox
+        public void LoadComboBox()
+        {
+            string link = "https://localhost:44337/api/danhmuc"; // URL API lấy danh sách danh mục
+            HttpWebRequest request = WebRequest.CreateHttp(link); // Tạo yêu cầu HTTP GET
+            WebResponse response = request.GetResponse(); // Nhận phản hồi từ API
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(DanhMuc[])); // Chuyển JSON thành mảng đối tượng DanhMuc
+            object data = js.ReadObject(response.GetResponseStream());
+            DanhMuc[] arr = data as DanhMuc[]; // Ép kiểu object thành mảng DanhMuc
+            cboDanhMuc.DataSource = arr; // Gắn dữ liệu vào ComboBox
+            cboDanhMuc.ValueMember = "MaDanhMuc"; // Gán giá trị hiển thị (ID)
+            cboDanhMuc.DisplayMember = "TenDanhMuc"; // Gán tên hiển thị
+        }
+
+        // Hàm thực thi khi form được load
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            LoadDataGridView(); // Load dữ liệu sản phẩm
+            LoadComboBox(); // Load dữ liệu danh mục
+        }
+
+        // Hàm xử lý tìm kiếm sản phẩm theo mã danh mục
+        private void bntTim_Click(object sender, EventArgs e)
+        {
+            string madm = txtMaDM.Text; // Lấy mã danh mục từ TextBox
+            string link = "https://localhost:44391/api/SanPham?madm=" + madm; // API tìm kiếm sản phẩm
+            HttpWebRequest request = WebRequest.CreateHttp(link); // Tạo yêu cầu HTTP GET
+            WebResponse response = request.GetResponse(); // Nhận phản hồi từ API
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bnt_Them[])); // Chuyển JSON thành mảng sản phẩm
+            object data = js.ReadObject(response.GetResponseStream());
+            bnt_Them[] arr = data as bnt_Them[]; // Ép kiểu object thành mảng sản phẩm
+            dataGridView1.DataSource = arr; // Gắn dữ liệu vào DataGridView
+        }
+
+        // Hàm xử lý thêm sản phẩm mới
+        private void bntThem_Click(object sender, EventArgs e)
+        {
+            // Chuỗi giá trị nhập từ Form
+            string postString = string.Format("?ma={0}&ten={1}&gia={2}&madm={3}", txtMaSP.Text, txtTenSP.Text,
+            txtDonGia.Text, cboDanhMuc.SelectedValue);
+            string link = "https://localhost:44391/api/SanPham" + postString; // API thêm sản phẩm
+            HttpWebRequest request = HttpWebRequest.CreateHttp(link); // Tạo yêu cầu HTTP POST
+            request.Method = "POST";
+            Stream dataStream = request.GetRequestStream(); // Mở luồng dữ liệu
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bool)); // Serializer kết quả trả về
+            object data = js.ReadObject(request.GetResponse().GetResponseStream());
+            bool kq = (bool)data; // Kiểm tra kết quả trả về (true/false)
+            if (kq)
+            {
+                LoadDataGridView(); // Reload danh sách sản phẩm
+                MessageBox.Show("Thêm sản phẩm thành công");
+            }
+            else
+            {
+                MessageBox.Show("Thêm sản phẩm thất bại");
+            }
+        }
+
+        // Hàm xử lý khi chọn ô trong DataGridView
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int d = e.RowIndex; // Lấy chỉ số dòng được chọn
+            // Gắn giá trị các cột tương ứng vào các TextBox
+            txtMaSP.Text = dataGridView1.Rows[d].Cells[0].Value.ToString();
+            txtTenSP.Text = dataGridView1.Rows[d].Cells[1].Value.ToString();
+            txtDonGia.Text = dataGridView1.Rows[d].Cells[2].Value.ToString();
+            cboDanhMuc.Text = dataGridView1.Rows[d].Cells[3].Value.ToString();
+        }
+
+        // Hàm xử lý sửa sản phẩm
+        private void bntSua_Click(object sender, EventArgs e)
+        {
+            string putString = string.Format("?ma={0}&ten={1}&gia={2}&madm={3}", txtMaSP.Text, txtTenSP.Text,
+            txtDonGia.Text, cboDanhMuc.SelectedValue);
+            string link = "https://localhost:44391/api/SanPham" + putString; // API sửa sản phẩm
+            HttpWebRequest request = HttpWebRequest.CreateHttp(link); // Tạo yêu cầu HTTP PUT
+            request.Method = "PUT";
+            Stream dataStream = request.GetRequestStream(); // Mở luồng dữ liệu
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bool)); // Serializer kết quả trả về
+            object data = js.ReadObject(request.GetResponse().GetResponseStream());
+            bool kq = (bool)data; // Kiểm tra kết quả trả về
+            if (kq)
+            {
+                MessageBox.Show("Sửa sản phẩm thành công");
+                LoadDataGridView(); // Reload danh sách sản phẩm
+            }
+            else
+            {
+                MessageBox.Show("Sửa sản phẩm thất bại");
+            }
+        }
+
+        // Hàm xử lý xóa sản phẩm
+        private void bntXoa_Click(object sender, EventArgs e)
+        {
+            string masp = txtMaSP.Text; // Lấy mã sản phẩm từ TextBox
+            string deleteString = string.Format("?id={0}", masp);
+            string link = "https://localhost:44391/api/SanPham" + deleteString; // API xóa sản phẩm
+            HttpWebRequest request = HttpWebRequest.CreateHttp(link); // Tạo yêu cầu HTTP DELETE
+            request.Method = "DELETE";
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bool)); // Serializer kết quả trả về
+            object data = js.ReadObject(request.GetResponse().GetResponseStream());
+            bool kq = (bool)data; // Kiểm tra kết quả trả về
+            if (kq)
+            {
+                LoadDataGridView(); // Reload danh sách sản phẩm
+                MessageBox.Show("Xóa sản phẩm thành công");
+            }
+        }
+    }
+}
