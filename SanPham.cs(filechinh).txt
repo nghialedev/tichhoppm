@@ -59,7 +59,7 @@ namespace _2021600020_LeTranDaiNghia_Goi
         }
 
         // Hàm xử lý tìm kiếm sản phẩm theo mã danh mục
-        private void bntTim_Click(object sender, EventArgs e)
+        private void btnTim_Click(object sender, EventArgs e)
         {
             string madm = txtMaDM.Text; // Lấy mã danh mục từ TextBox
             string link = "https://localhost:44391/api/SanPham?madm=" + madm; // API tìm kiếm sản phẩm
@@ -72,7 +72,7 @@ namespace _2021600020_LeTranDaiNghia_Goi
         }
 
         // Hàm xử lý thêm sản phẩm mới
-        private void bntThem_Click(object sender, EventArgs e)
+        private void btnThem_Click(object sender, EventArgs e)
         {
             // Chuỗi giá trị nhập từ Form
             string postString = string.Format("?ma={0}&ten={1}&gia={2}&madm={3}", txtMaSP.Text, txtTenSP.Text,
@@ -107,7 +107,7 @@ namespace _2021600020_LeTranDaiNghia_Goi
         }
 
         // Hàm xử lý sửa sản phẩm
-        private void bntSua_Click(object sender, EventArgs e)
+        private void btnSua_Click(object sender, EventArgs e)
         {
             string putString = string.Format("?ma={0}&ten={1}&gia={2}&madm={3}", txtMaSP.Text, txtTenSP.Text,
             txtDonGia.Text, cboDanhMuc.SelectedValue);
@@ -130,7 +130,7 @@ namespace _2021600020_LeTranDaiNghia_Goi
         }
 
         // Hàm xử lý xóa sản phẩm
-        private void bntXoa_Click(object sender, EventArgs e)
+        private void btnXoa_Click(object sender, EventArgs e)
         {
             string masp = txtMaSP.Text; // Lấy mã sản phẩm từ TextBox
             string deleteString = string.Format("?id={0}", masp);
