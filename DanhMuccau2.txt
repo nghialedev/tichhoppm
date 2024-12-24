@@ -13,3 +13,4 @@ namespace _2021600020_LeTranDaiNghia_Goi
         public string TenDM { get; set; }
     }
 }
+//Handler Mappings -> WebDAV -> Request Restrictions  ->Verbs ->All verbs
