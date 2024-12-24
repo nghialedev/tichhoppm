@@ -20,7 +20,7 @@ namespace _2021600020_LeTranDaiNghia_Goi
     public partial class bnt_Them : Form
     {
         // Hàm khởi tạo form
-        public bnt_Them()
+        public btn_Them()
         {
             InitializeComponent(); // Tự động tạo các thành phần trong form
         }
