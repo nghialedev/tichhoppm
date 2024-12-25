@@ -1,0 +1,81 @@
+namespace _2021600020_LeTranDaiNghia_Goi
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent(); // Khởi tạo form
+        }
+
+        // Hiển thị danh sách sản phẩm lên DataGridView
+        public void LoadDataGridView()
+        {
+            string link = "https://localhost:44391/api/SanPham"; // API Danhsach
+            HttpWebRequest request = WebRequest.CreateHttp(link);
+            WebResponse response = request.GetResponse();
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(SanPham[]));
+            object data = js.ReadObject(response.GetResponseStream());
+            SanPham[] arr = data as SanPham[];
+            dataGridView1.DataSource = arr; // Gắn dữ liệu
+        }
+
+        // Thêm sản phẩm
+        private void bntThem_Click(object sender, EventArgs e)
+        {
+            string postString = string.Format("?ma={0}&ten={1}&gia={2}",
+                txtMaSP.Text, txtTenSP.Text, txtDonGia.Text);
+            string link = "https://localhost:44391/api/SanPham/ThemSP" + postString; // API ThemSP
+            HttpWebRequest request = WebRequest.CreateHttp(link);
+            request.Method = "POST";
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bool));
+            object data = js.ReadObject(request.GetResponse().GetResponseStream());
+            bool kq = (bool)data;
+            if (kq)
+            {
+                LoadDataGridView();
+                MessageBox.Show("Thêm sản phẩm thành công");
+            }
+            else
+            {
+                MessageBox.Show("Thêm sản phẩm thất bại");
+            }
+        }
+
+        // Xóa sản phẩm
+        private void bntXoa_Click(object sender, EventArgs e)
+        {
+            string masp = txtMaSP.Text; // Lấy mã sản phẩm
+            string link = "https://localhost:44391/api/SanPham/XoaSP?id=" + masp; // API XoaSP
+            HttpWebRequest request = WebRequest.CreateHttp(link);
+            request.Method = "DELETE";
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(bool));
+            object data = js.ReadObject(request.GetResponse().GetResponseStream());
+            bool kq = (bool)data;
+            if (kq)
+            {
+                LoadDataGridView();
+                MessageBox.Show("Xóa sản phẩm thành công");
+            }
+            else
+            {
+                MessageBox.Show("Xóa sản phẩm thất bại");
+            }
+        }
+
+        // Form load
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            LoadDataGridView(); // Tải danh sách sản phẩm
+        }
+    }
+
+    // Lớp mô tả bảng SanPham
+    public class SanPham
+    {
+        public string MaSP { get; set; }
+        public string TenSP { get; set; }
+        public string DVTinh { get; set; }
+        public int SoLuong { get; set; }
+        public decimal Gia { get; set; }
+    }
+}
